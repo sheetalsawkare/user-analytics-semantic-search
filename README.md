@@ -1,117 +1,20 @@
 # User Analytics & Semantic Search System
 
-A backend system built with FastAPI that tracks user events, provides analytics, and enables AI-powered semantic search using embeddings.
+## Overview
 
-## Features
+A FastAPI-based backend system for tracking user events, generating embeddings, providing analytics, and performing semantic search.
 
-### Event Tracking API
+### Features
 
-Track user events and store them in PostgreSQL.
-
-**Endpoint**
-
-```http
-POST /track
-```
-
-**Request**
-
-```json
-{
-  "userId": "123",
-  "event": "user viewed pricing page",
-  "event_metadata": {
-    "page": "/pricing"
-  }
-}
-```
-
-**Capabilities**
-
-* Store user events
-* Generate embeddings using FastEmbed
-* Store embeddings separately from event data
-* Input validation using Pydantic
-
----
-
-### Analytics API
-
-Provides aggregated insights from tracked events.
-
-**Endpoint**
-
-```http
-GET /analytics
-```
-
-**Supported Filters**
-
-```http
-GET /analytics?event=pricing
-GET /analytics?from=2026-01-01
-GET /analytics?to=2026-01-31
-```
-
-**Returns**
-
-* Total events
-* Events per user
-* Most active users
-
-Example Response:
-
-```json
-{
-  "total_events": 10,
-  "events_per_user": {
-    "1": 4,
-    "2": 6
-  },
-  "most_active_users": [
-    {
-      "user_id": "2",
-      "event_count": 6
-    }
-  ]
-}
-```
-
----
-
-### Semantic Search API
-
-Search events using semantic similarity instead of exact keyword matching.
-
-**Endpoint**
-
-```http
-GET /search?query=pricing
-```
-
-**Workflow**
-
-1. Generate embedding for search query
-2. Compare with stored event embeddings
-3. Calculate cosine similarity
-4. Return most relevant events
-
-Example Response:
-
-```json
-{
-  "query": "pricing",
-  "total_results": 2,
-  "results": [
-    {
-      "event_id": "123",
-      "user_id": "1",
-      "event": "customer opened pricing page",
-      "similarity_score": 0.82
-    }
-  ]
-}
-```
+* Event Tracking API
+* Analytics API
+* Semantic Search API
+* PostgreSQL Persistence
+* Embedding Storage
+* Vector Similarity Search
+* Pydantic Validation
+* Error Handling
+* Alembic Database Migrations
 
 ---
 
@@ -123,48 +26,6 @@ Example Response:
 * Alembic
 * FastEmbed
 * NumPy
-* Pydantic v2
-
----
-
-## Project Structure
-
-```text
-app/
-├── api/
-│   ├── track.py
-│   ├── analytics.py
-│   └── search.py
-│
-├── core/
-│   └── config.py
-│
-├── db/
-│   ├── database.py
-│   ├── base.py
-│   └── base_imports.py
-│
-├── models/
-│   ├── event.py
-│   └── event_embedding.py
-│
-├── schemas/
-│   ├── event.py
-│   ├── analytics.py
-│   └── search.py
-│
-├── services/
-│   ├── event_service.py
-│   ├── event_embedding_service.py
-│   ├── embedding_service.py
-│   ├── analytics_service.py
-│   └── search_service.py
-│
-├── utils/
-│   └── similarity.py
-│
-└── main.py
-```
 
 ---
 
@@ -190,86 +51,16 @@ app/
 | embedding  | JSONB    |
 | created_at | DateTime |
 
----
+### Design Decision
 
-## Architecture
+Embeddings are stored in a separate table instead of the events table.
 
-```text
-POST /track
-        │
-        ▼
- Store Event
-        │
-        ▼
- Generate Embedding
-   (FastEmbed)
-        │
-        ▼
- Store Embedding
+Benefits:
 
-GET /analytics
-        │
-        ▼
- Aggregation Queries
-        │
-        ▼
- Analytics Response
-
-GET /search
-        │
-        ▼
- Query Embedding
-        │
-        ▼
- Cosine Similarity
-        │
-        ▼
- Ranked Results
-```
-
----
-
-## Design Decisions
-
-### Why Separate Event and Embedding Tables?
-
-Event data and vector data serve different purposes.
-
-Keeping embeddings in a separate table:
-
-* Improves maintainability
-* Keeps event records lightweight
-* Makes migration to a vector database easier
-* Follows separation of concerns
-
-### Why FastEmbed?
-
-FastEmbed provides lightweight and efficient embedding generation suitable for semantic search without requiring large model dependencies.
-
-### Why JSONB for Embeddings?
-
-The assignment allowed using a vector database or a similar approach.
-
-For simplicity and portability:
-
-* Embeddings are stored in PostgreSQL JSONB columns
-* Semantic search is performed in the application layer
-* Architecture can easily migrate to pgvector, FAISS, ChromaDB, Pinecone, or Qdrant
-
-### Similarity Metric
-
-Cosine Similarity is used to compare query embeddings with stored event embeddings.
-
----
-
-## Error Handling
-
-Implemented:
-
-* Pydantic request validation
-* Empty field validation
-* Database transaction rollback
-* FastAPI exception handling
+* Separation of concerns
+* Easier migration to FAISS/Pinecone/ChromaDB
+* Better scalability
+* Cleaner schema
 
 ---
 
@@ -295,13 +86,15 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Configure Environment Variables
+### Configure Database
 
-Create a `.env` file:
+Create PostgreSQL database:
 
-```env
-DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/user_analytics
+```sql
+CREATE DATABASE user_analytics;
 ```
+
+Update database configuration if required.
 
 ### Run Migrations
 
@@ -309,13 +102,19 @@ DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/user_analytic
 alembic upgrade head
 ```
 
-### Start Server
+### Start Application
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-### API Documentation
+Application:
+
+```text
+http://127.0.0.1:8000
+```
+
+Swagger Docs:
 
 ```text
 http://127.0.0.1:8000/docs
@@ -323,20 +122,130 @@ http://127.0.0.1:8000/docs
 
 ---
 
-## Future Improvements
+# APIs
 
-* pgvector integration
-* FAISS integration
-* Similar Users API
-* Background embedding generation
-* Pagination for search results
-* Caching layer
-* User management and authentication
+## 1. Track Event
+
+POST /track
+
+Request
+
+```json
+{
+  "userId": "1",
+  "event": "customer opened pricing page",
+  "event_metadata": {
+    "page": "/pricing"
+  }
+}
+```
+
+Response
+
+```json
+{
+  "id": "uuid",
+  "user_id": "1",
+  "event": "customer opened pricing page"
+}
+```
 
 ---
 
-## Author
+## 2. Analytics
 
-Sheetal Sawkare
+GET /analytics
 
-Backend Assignment Submission
+Response
+
+```json
+{
+  "total_events": 4,
+  "events_per_user": {
+    "1": 2,
+    "2": 1,
+    "3": 1
+  },
+  "most_active_users": [
+    {
+      "user_id": "1",
+      "event_count": 2
+    }
+  ]
+}
+```
+
+Filters
+
+```http
+GET /analytics?event=pricing
+GET /analytics?from_date=2026-01-01
+GET /analytics?to_date=2026-01-31
+```
+
+---
+
+## 3. Semantic Search
+
+GET /search?query=pricing
+
+Response
+
+```json
+{
+  "query": "pricing",
+  "total_results": 2,
+  "results": [
+    {
+      "event_id": "uuid",
+      "user_id": "1",
+      "event": "customer opened pricing page",
+      "similarity_score": 0.78
+    }
+  ]
+}
+```
+
+---
+
+## Embedding Strategy
+
+FastEmbed is used to generate vector embeddings from event text.
+
+Workflow:
+
+1. User event received
+2. Event stored in PostgreSQL
+3. Text converted into embedding
+4. Embedding stored separately
+5. Search query converted to embedding
+6. Cosine similarity performed
+7. Top matching events returned
+
+---
+
+## Scalability Considerations
+
+Current implementation stores embeddings in PostgreSQL (JSONB).
+
+For production systems:
+
+* FAISS
+* Pinecone
+* ChromaDB
+* pgvector
+
+can replace the current storage/search layer with minimal changes.
+
+---
+
+## Future Improvements
+
+* Similar Users API
+* Background embedding generation
+* pgvector integration
+* Caching
+* Pagination
+* Authentication & Authorization
+
+---
