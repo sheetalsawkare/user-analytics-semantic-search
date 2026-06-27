@@ -33,16 +33,6 @@ class Event(Base):
         nullable=True
     )
 
-    # timestamp: Mapped[datetime] = mapped_column(
-    #     DateTime,
-    #     nullable=False
-    # )
-
-    # created_at: Mapped[datetime] = mapped_column(
-    #     DateTime,
-    #     default=datetime.utcnow
-    # )
-
     timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False

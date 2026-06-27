@@ -1,8 +1,6 @@
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.models.event import Event
-
 
 class AnalyticsService:
 
@@ -92,3 +90,4 @@ class AnalyticsService:
             "events_per_user": events_per_user,
             "most_active_users": most_active_users
         }
+    

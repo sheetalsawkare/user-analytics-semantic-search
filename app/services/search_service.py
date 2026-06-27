@@ -1,9 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.models.event import Event
 from app.models.event_embedding import EventEmbedding
-
 from app.services.embedding_service import embedding_service
 from app.utils.similarity import cosine_similarity
 

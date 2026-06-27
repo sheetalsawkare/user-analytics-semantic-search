@@ -1,7 +1,5 @@
 from datetime import datetime
-
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.models.event import Event
 from app.services.embedding_service import embedding_service
 from app.services.event_embedding_service import EventEmbeddingService

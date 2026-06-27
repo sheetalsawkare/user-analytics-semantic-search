@@ -1,8 +1,6 @@
 from datetime import datetime
 from typing import Any
-
 from pydantic import BaseModel, Field
-
 
 class EventTrackRequest(BaseModel):
     userId: str = Field(..., min_length=1)

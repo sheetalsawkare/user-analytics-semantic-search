@@ -28,11 +28,6 @@ class EventEmbedding(Base):
         nullable=False
     )
 
-    # created_at: Mapped[datetime] = mapped_column(
-    #     DateTime,
-    #     default=datetime.utcnow
-    # )
-
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC)

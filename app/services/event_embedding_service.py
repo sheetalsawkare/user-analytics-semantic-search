@@ -1,7 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.models.event_embedding import EventEmbedding
-
 
 class EventEmbeddingService:
 
@@ -25,3 +23,4 @@ class EventEmbeddingService:
         except Exception:
             await db.rollback()
             raise
+        
